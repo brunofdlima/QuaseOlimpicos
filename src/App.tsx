@@ -29,7 +29,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-8 space-y-6 text-gray-800 animate-fadeIn">
         <textarea
           className="w-full h-28 p-4 rounded-xl border-2 border-gray-300 focus:border-teal-500 outline-none transition-all"
-          placeholder="Digite os nomes"
+          placeholder="Digite os nomes separado por vírgulas"
           value={participants}
           onChange={(e) => setParticipants(e.target.value)}
         />
