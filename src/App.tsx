@@ -29,7 +29,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-8 space-y-6 text-gray-800 animate-fadeIn">
         <textarea
           className="w-full h-28 p-4 rounded-xl border-2 border-gray-300 focus:border-teal-500 outline-none transition-all"
-          placeholder="Digite os nomes separado por vírgulas"
+          placeholder="Digite os nomes separado por vírgulas."
           value={participants}
           onChange={(e) => setParticipants(e.target.value)}
         />
@@ -55,7 +55,7 @@ const App: React.FC = () => {
       </div>
 
       {showTeams && (
-        <div className="w-full max-w-4xl mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
+        <div className="w-full mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 lg:px-[31.25rem] gap-6 animate-fadeIn text-center ml-auto">
           {result.map((team, index) => (
             <div
               key={index}
