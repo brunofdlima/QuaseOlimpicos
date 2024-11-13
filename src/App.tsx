@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiUsers } from 'react-icons/fi';
 import { FaVolleyball } from "react-icons/fa6";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
+import emailjs from 'emailjs-com';
 
 const App: React.FC = () => {
   const [participants, setParticipants] = useState<string>('');
@@ -18,6 +19,33 @@ const App: React.FC = () => {
     );
     setResult(sortedTeams);
     setShowTeams(true);
+
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString();
+    const formattedTime = now.toLocaleTimeString();
+
+    const message = `Times sorteados em ${formattedDate} às ${formattedTime}:\n\n` +
+      sortedTeams
+        .map((team, index) => `Time ${index + 1}: ${team.join(', ')}`)
+        .join('\n');
+
+    emailjs
+      .send(
+        'service_1g8vmmj', //Service ID
+        'template_4fmy7fi', //Template ID
+        { message:message },
+        '-mqtRrPICZkBZe1DM' //Public Key
+      )
+      .then(
+        (response) => {
+          console.log('Email enviado com sucesso:', response);
+          alert('Os dados foram enviados para o email!');
+        },
+        (error) => {
+          console.error('Erro ao enviar email:', error);
+          alert('Erro ao enviar email. Tente novamente.');
+        }
+      );
   };
 
   return (
