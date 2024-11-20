@@ -5,22 +5,54 @@ import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import emailjs from 'emailjs-com';
 
 const App: React.FC = () => {
-  const [participants, setParticipants] = useState<string>('');
-  const [teams, setTeams] = useState<number>(2);
+  const [participants, setParticipants] = useState<string>(''); //Participantes
+  const [teams, setTeams] = useState<number>(2); //Times sorteados
   const [result, setResult] = useState<string[][]>([]);
   const [showTeams, setShowTeams] = useState(false);
+  const [history, setHistory] = useState<string[][][]>([]); // Histórico de sorteios
 
-  const handleSortTeams = () => {
-    const names = participants.split(',').map(name => name.trim()).filter(name => name);
-    const shuffledNames = names.sort(() => Math.random() - 0.5);
+  const generateTeams = (names: string[]): string[][] => {
+    let shuffledNames = names.sort(() => Math.random() - 0.5);
     const teamSize = Math.ceil(shuffledNames.length / teams);
     const sortedTeams = Array.from({ length: teams }, (_, i) =>
       shuffledNames.slice(i * teamSize, (i + 1) * teamSize)
     );
+    return sortedTeams;
+  };
+
+  const isRepeated = (newTeams: string[][]): boolean => {
+    return history.some((oldTeams) => {
+      return oldTeams.every((team, index) =>
+        team.every((member) => newTeams[index]?.includes(member))
+      );
+    });
+  };
+
+  const handleSortTeams = () => {
+    const names = participants.split(',').map(name => name.trim()).filter(name => name);
+    if (names.length < teams) {
+      alert("Número de participantes deve ser maior ou igual ao número de times.");
+      return;
+    }
+
+    let sortedTeams: string[][] = [];
+    let attempts = 0;
+    const maxAttempts = 50; // Limitar para evitar loops infinitos
+
+    do {
+      sortedTeams = generateTeams(names);
+      attempts++;
+    } while (isRepeated(sortedTeams) && attempts < maxAttempts);
+
+    if (attempts >= maxAttempts) {
+      alert("Não foi possível gerar uma combinação única. Tente novamente.");
+    }
+
     setResult(sortedTeams);
+    setHistory((prev) => [...prev, sortedTeams]); // Atualizar histórico
     setShowTeams(true);
 
-    const now = new Date();
+    const now = new Date(); //formatação de dados de data e hora para envio de e-mail
     const formattedDate = now.toLocaleDateString();
     const formattedTime = now.toLocaleTimeString();
 
@@ -29,23 +61,23 @@ const App: React.FC = () => {
         .map((team, index) => `Time ${index + 1}: ${team.join(', ')}`)
         .join('\n');
 
-    emailjs
-      .send(
-        'service_1g8vmmj', //Service ID
-        'template_4fmy7fi', //Template ID
-        { message:message },
-        '-mqtRrPICZkBZe1DM' //Public Key
-      )
-      .then(
-        (response) => {
-          console.log('Email enviado com sucesso:', response);
-          alert('Os dados foram enviados para o email!');
-        },
-        (error) => {
-          console.error('Erro ao enviar email:', error);
-          alert('Erro ao enviar email. Tente novamente.');
-        }
-      );
+        emailjs //Service E-mail
+        .send(
+          'service_1g8vmmj', //Service ID
+          'template_4fmy7fi', //Template ID
+          { message:message },
+          '-mqtRrPICZkBZe1DM' //Public Key
+        )
+        .then(
+          (response) => {
+            console.log('Email enviado com sucesso:', response);
+            alert('Os dados foram enviados para o email!');
+          },
+          (error) => {
+            console.error('Erro ao enviar email:', error);
+            alert('Erro ao enviar email. Verificar se pode ser a API');
+          }
+        );
   };
 
   return (
